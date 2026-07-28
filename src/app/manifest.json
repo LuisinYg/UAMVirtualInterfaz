@@ -1,0 +1,22 @@
+
+{
+  "name": "UAMVirtual",
+  "short_name": "UAMVirtual",
+  "description": "Sistema de Videoconferencias Académicas UAM",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#F2760C",
+  "icons": [
+    {
+      "src": "https://picsum.photos/seed/uam/192/192",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://picsum.photos/seed/uam/512/512",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

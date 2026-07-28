@@ -1,0 +1,51 @@
+/**
+ * @fileoverview Firestore Security Rules for AulaConnect.
+ *
+ * Core Philosophy: This ruleset enforces a strict user-ownership model for user profiles.
+ *
+ * Data Structure: All user data is nested under `/users/{userId}`.
+ *
+ * Key Security Decisions:
+ * - Users can only access their own profile data.
+ * - User listing is explicitly disallowed.
+ * - Data shape is not validated in this prototype to allow for rapid iteration.
+ * - Denormalization for Authorization: None required as access is based on `request.auth.uid == userId`.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /**
+     * @description Controls access to user profile information. Only the authenticated user can read or write their own profile.
+     * @path /users/{userId}
+     * @allow (create) User with ID 'user123' can create their profile if authenticated as 'user123'.
+     * @allow (get) User with ID 'user123' can read their profile if authenticated as 'user123'.
+     * @allow (update) User with ID 'user123' can update their profile if authenticated as 'user123'.
+     * @allow (delete) User with ID 'user123' can delete their profile if authenticated as 'user123'.
+     * @deny (create) User with ID 'user123' cannot create a profile for 'user456'.
+     * @deny (get) User with ID 'user123' cannot read the profile of 'user456'.
+     * @deny (update) User with ID 'user123' cannot update the profile of 'user456'.
+     * @deny (delete) User with ID 'user123' cannot delete the profile of 'user456'.
+     * @principle Enforces document ownership for all operations.
+     */
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+      allow list: if false;
+      allow create: if isSignedIn() && isOwner(userId) && request.resource.data.id == userId;
+      allow update: if isSignedIn() && isOwner(userId) && resource.data.id == request.resource.data.id;
+      allow delete: if isSignedIn() && isExistingOwner(userId);
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+        return isOwner(userId) && resource != null;
+    }
+  }
+}

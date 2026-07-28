@@ -1,0 +1,24 @@
+# dependencias
+/node_modules
+/.pnp
+.pnp.js
+
+# carpetas de compilación
+/.next/
+/out/
+/build
+
+# archivos de sistema
+.DS_Store
+Thumbs.db
+
+# registros de errores
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# variables de entorno locales
+.env*.local
+
+# firebase hosting
+.firebase/

@@ -1,0 +1,79 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user account for the AulaConnect application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the user.",
+          "format": "uuid"
+        },
+        "username": {
+          "type": "string",
+          "description": "The username of the user."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the user.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The date and time when the user account was created.",
+          "format": "date-time"
+        },
+        "lastLogin": {
+          "type": "string",
+          "description": "The date and time when the user last logged in.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "username",
+        "email",
+        "firstName",
+        "lastName",
+        "createdAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores user profile information. Access is restricted to the user identified by {userId}.  Denormalized authorization: None required as access is based on `request.auth.uid == userId`.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique identifier of the user."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "This Firestore structure is designed to support the AulaConnect application, focusing on secure user authentication and scalable data storage for video conferencing and related features.  It emphasizes Authorization Independence to simplify security rules and maintain data integrity.\n\n**Authorization Independence & QAPs:**\n\n*   User data is stored under `/users/{userId}`. Access is controlled directly via the `request.auth.uid`, ensuring only the authenticated user can access their data.  No `get()` calls are required to determine user identity.\n\n*   Currently there are no collaborative features in the App, but using the suggested structure, it would be simple to add. For example, if we had to create a feature to share documents, we could create a collection `/users/{userId}/documents/{documentId}`.\n\n**Explanation of Structure:**\n\n*   `/users/{userId}`:  This collection stores user profiles. Each user's document is located at a path directly derived from their `userId`."
+  }
+}
